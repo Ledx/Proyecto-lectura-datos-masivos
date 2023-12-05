@@ -9,9 +9,8 @@ public class Main {
         FileReader fr = null;
         BufferedReader parametros = null;
         String rutaP = new File("").getAbsolutePath() + "\\src\\Configuracion\\parametros.txt";
-        String rutaE, nombre, campos, registros, multiprocesamiento;
-        Boolean filtradoH,filtradoV;
-
+        String rutaE, nombre, campos, registros,multiprocesamiento;
+        Boolean hilos;
         try {
             fr=new FileReader(rutaP);
             parametros = new BufferedReader(fr);
@@ -31,16 +30,19 @@ public class Main {
             throw new RuntimeException(e);
         }
 
-        CSV csv = new CSV(rutaE,nombre);
-        System.out.println("El numero de lineas es: " + csv.archivoEntrada.getnLineas());
+        if(multiprocesamiento.equals("si"))
+            hilos = Boolean.TRUE;
+        else
+            hilos = Boolean.FALSE;
+
         tInicial = System.currentTimeMillis();
 
-
+        CSV csv = new CSV(rutaE,nombre,campos,registros,hilos,1);
+        System.out.println("Filtrado terminado con exito.");
 
         tFinal = System.currentTimeMillis() - tInicial;
 
-
-        System.out.println("El tiempo de procesamiento fue de: " + tFinal);
+        System.out.println("El tiempo de procesamiento fue de: " + tFinal + " [ms]");
 
     }
 }

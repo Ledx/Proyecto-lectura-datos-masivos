@@ -6,6 +6,7 @@ public class ProcesaCSV {
     public ProcesaCSV (){
 
         this.CPUs = Runtime.getRuntime().availableProcessors();
+        this.nHilos = 4 * this.CPUs;
         System.out.println("\n Numero de CPUs: \t " + CPUs );
     }
 }
