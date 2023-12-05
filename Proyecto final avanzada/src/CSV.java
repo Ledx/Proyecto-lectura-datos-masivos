@@ -54,12 +54,6 @@ public class CSV {
             fv = this.validarFiltroV(registrosF);
             this.filtroVertical = registrosF;
         }
-        /*escribirLinea( this.cabecera.toString(), salida );
-        escribirLinea( leerLinea(), salida );
-        escribirLinea( leerLinea(), salida );
-        escribirLinea( leerLinea(), salida );
-        escribirLinea( leerLinea(), salida );
-        escribirLinea( leerLinea(), salida );*/
 
     }
 
@@ -98,10 +92,6 @@ public class CSV {
         try {
             this.fw = new FileWriter(salida);
             inyector_linea = new BufferedWriter(fw);
-            inyector_linea.write("41,Yes,Non-Travel,489,Hardware,9,1,Technical Degree,1,1,4,Female,182,1,5,Research Director,4,Divorced,18754,487604,7,Y,Yes,34,2,1,80,3,26,1,3,12,3,12,3\n");
-            inyector_linea.write( "26,No,Non-Travel,841,Hardware,39,1,Medical,1,2,3,Male,79,1,1,Healthcare Representative,3,Married,32362,64724,0,Y,No,23,2,2,80,1,14,5,1,3,1,1,1\n");
-
-            inyector_linea.close();
         } catch (IOException e) {
             e.getStackTrace();
         }
@@ -148,14 +138,27 @@ public class CSV {
 
     }
 
-    public void escribirLinea(String linea,File salida){
+    public void escribirLinea(String linea){
 
         try {
-            inicializarEscritor(salida);
-            inyector_linea.write(linea + '\n');
+            //inicializarEscritor(salida);
+            inyector_linea.write(linea+'\n');
         }
         catch (IOException e) {
             System.out.println("El archivo de salida no pudo ser abierto.");
+            exit(-2);
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void terminarEscritura(){
+
+        try {
+
+            inyector_linea.close();
+        }
+        catch (IOException e) {
+            System.out.println("El archivo de salida no pudo ser cerrado.");
             exit(-2);
             throw new RuntimeException(e);
         }
