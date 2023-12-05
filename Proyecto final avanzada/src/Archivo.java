@@ -15,7 +15,7 @@ public class Archivo {
     }
 
     private String rutaE;
-    private String rutaS;
+
     private int nLineas;
     private String nombreE;
     private File archivo;
@@ -51,15 +51,7 @@ public class Archivo {
         this.nLineas = nLineas;
     }
 
-    public String getRutaS() {
-        return rutaS;
-    }
-
-    public void setRutaS(String rutaS) {
-        this.rutaS = rutaS;
-    }
-
-    public String getRutaE() {
+   public String getRutaE() {
         return rutaE;
     }
 

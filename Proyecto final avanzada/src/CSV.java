@@ -19,7 +19,7 @@ public class CSV {
     private  FileReader fr;
     private BufferedReader extractor_linea;
 
-    private  FileWriter fw;
+    private  Writer fw;
     private BufferedWriter inyector_linea;
     private Boolean fh;
     private Boolean fv;
@@ -27,30 +27,21 @@ public class CSV {
 
     private String filtroVertical;
 
-    public CSV(String rutaE,String nombre, String camposF, String registrosF, Boolean hilos,int id){
+    public CSV(String rutaE,String nombre, String camposF, String registrosF, Boolean hilos,int id)  {
 
+        
         this.archivoEntrada = new Archivo(rutaE,nombre);
         String rutacsv = this.archivoEntrada.getRutaE();
         this.inicializarLector(rutacsv);
 
-        String r = new File("").getAbsolutePath() + "\\src";
-        String nombreSalida;
-        r = r + rutaE;
-        this.crearDirectorioSalida(r);
-        try {
-            nombreSalida = this.nombrarArchivoSalida(nombre,String.valueOf(id));
-            File f = new File(r+"" + "temp\\"  + nombreSalida);
-
-            if (f.createNewFile()) {
-                this.archivoSalida = new Archivo(rutaE +"" + "temp\\",nombreSalida);
-            }
-        } catch (IOException e) {
-            System.out.println("El archivo de salida no pudo ser creado.");
-            e.printStackTrace();
-        }
-        rutacsv = this.archivoSalida.getRutaE();
-        this.inicializarEscritor(rutacsv);
-
+        String rutaDirectorioSalida = new File("").getAbsolutePath() + "\\src";
+        Path pathDirectorioSalida  = Paths.get(rutaDirectorioSalida + rutaE + "\\temp");
+        String nombreSalida = this.nombrarArchivoSalida(nombre,String.valueOf(id));
+        this.crearDirectorioSalida(pathDirectorioSalida);
+        rutacsv = pathDirectorioSalida + "\\" + nombreSalida;
+        File salida = new File(rutacsv);
+        this.inicializarEscritor(salida);
+        this.archivoSalida = new Archivo(rutaE+ "\\temp\\",nombreSalida);
 
         this.extraerCabecera();
         this.fh = this.extraerFiltroH(camposF);
@@ -63,9 +54,12 @@ public class CSV {
             fv = this.validarFiltroV(registrosF);
             this.filtroVertical = registrosF;
         }
-        escribirLinea( this.cabecera );
-        String prueba = leerLinea();
-        System.out.println(prueba);
+        /*escribirLinea( this.cabecera.toString(), salida );
+        escribirLinea( leerLinea(), salida );
+        escribirLinea( leerLinea(), salida );
+        escribirLinea( leerLinea(), salida );
+        escribirLinea( leerLinea(), salida );
+        escribirLinea( leerLinea(), salida );*/
 
     }
 
@@ -74,6 +68,7 @@ public class CSV {
     }
 
     public void inicializarLector(String rutacsv){
+
         try {
             fr=new FileReader(rutacsv);
             extractor_linea = new BufferedReader(fr);
@@ -85,16 +80,32 @@ public class CSV {
         }
     }
 
-    public void inicializarEscritor(String rutacsv){
+    public void inicializarEscritor(File salida){
+
+        /*File salida = new File(rutacsv);
+
         try {
-            fw=new FileWriter(rutacsv);
+            fw=new FileWriter(salida);
             inyector_linea = new BufferedWriter(fw);
+            inyector_linea.write("sdfsdfsfsdf");
         }
         catch (IOException e) {
             System.out.println("El archivo de salida no pudo ser creado.");
             exit(-1);
             throw new RuntimeException(e);
+        }*/
+
+        try {
+            this.fw = new FileWriter(salida);
+            inyector_linea = new BufferedWriter(fw);
+            inyector_linea.write("41,Yes,Non-Travel,489,Hardware,9,1,Technical Degree,1,1,4,Female,182,1,5,Research Director,4,Divorced,18754,487604,7,Y,Yes,34,2,1,80,3,26,1,3,12,3,12,3\n");
+            inyector_linea.write( "26,No,Non-Travel,841,Hardware,39,1,Medical,1,2,3,Male,79,1,1,Healthcare Representative,3,Married,32362,64724,0,Y,No,23,2,2,80,1,14,5,1,3,1,1,1\n");
+
+            inyector_linea.close();
+        } catch (IOException e) {
+            e.getStackTrace();
         }
+
     }
 
     private void extraerCabecera(){
@@ -137,12 +148,13 @@ public class CSV {
 
     }
 
-    public void escribirLinea(String linea){
+    public void escribirLinea(String linea,File salida){
 
         try {
-            inyector_linea.write(linea);
-
-        } catch (IOException e) {
+            inicializarEscritor(salida);
+            inyector_linea.write(linea + '\n');
+        }
+        catch (IOException e) {
             System.out.println("El archivo de salida no pudo ser abierto.");
             exit(-2);
             throw new RuntimeException(e);
@@ -270,11 +282,10 @@ public class CSV {
         return token;
     }
 
-    public void crearDirectorioSalida(String ruta){
+    public void crearDirectorioSalida(Path path){
 
         try {
 
-            Path path = Paths.get(ruta + "\\temp");
             Files.createDirectories(path);
 
         } catch (IOException e) {
@@ -301,7 +312,7 @@ public class CSV {
         String anio = Integer.toString(c.get(Calendar.YEAR));
         //System.out.println("Archivo de salida: "+ this.nombreE.substring(0,this.nombreE.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")" + this.nombreE.substring(this.nombreE.length()-4));
 
-        return nombre.substring(0,nombre.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")"+ id + nombre.substring(nombre.length()-4 );
+        return nombre.substring(0,nombre.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")"+ nombre.substring(nombre.length()-4 );
 
     }
 
