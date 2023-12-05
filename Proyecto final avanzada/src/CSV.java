@@ -27,7 +27,7 @@ public class CSV {
 
     private String filtroVertical;
 
-    public CSV(String rutaE,String nombre, String camposF, String registrosF, Boolean hilos,int id)  {
+    public CSV(String rutaE,String nombre, String camposF, String registrosF)  {
 
         
         this.archivoEntrada = new Archivo(rutaE,nombre);
@@ -36,7 +36,7 @@ public class CSV {
 
         String rutaDirectorioSalida = new File("").getAbsolutePath() + "\\src";
         Path pathDirectorioSalida  = Paths.get(rutaDirectorioSalida + rutaE + "\\temp");
-        String nombreSalida = this.nombrarArchivoSalida(nombre,String.valueOf(id));
+        String nombreSalida = this.nombrarArchivoSalida(nombre);
         this.crearDirectorioSalida(pathDirectorioSalida);
         rutacsv = pathDirectorioSalida + "\\" + nombreSalida;
         File salida = new File(rutacsv);
@@ -299,7 +299,7 @@ public class CSV {
         }
     }
 
-    public String nombrarArchivoSalida(String nombre, String id){
+    public String nombrarArchivoSalida(String nombre){
 
         Calendar c = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("HH");

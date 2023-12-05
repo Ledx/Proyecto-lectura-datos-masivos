@@ -37,7 +37,7 @@ public class Main {
 
         tInicial = System.currentTimeMillis();
 
-        CSV csv = new CSV(rutaE,nombre,campos,registros,hilos,1);
+        ProcesaCSV manejador = new ProcesaCSV(rutaE,nombre,campos,registros,hilos);
         System.out.println("Filtrado terminado con exito.");
 
         tFinal = System.currentTimeMillis() - tInicial;
