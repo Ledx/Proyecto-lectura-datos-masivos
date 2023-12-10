@@ -4,18 +4,17 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Stream;
 
 import static java.lang.System.exit;
 
 public class CSV {
 
-    public Archivo archivoEntrada;
-    public Archivo archivoSalida;
-    public String cabecera;
+    private Archivo archivoEntrada;
+    private Archivo archivoSalida;
+    private String cabecera;
+    private String cabeceraF;
     private  FileReader fr;
     private BufferedReader extractor_linea;
 
@@ -26,8 +25,9 @@ public class CSV {
     private String filtroHorizontal;
 
     private String filtroVertical;
+    private String rutaDS;
 
-    public CSV(String rutaE,String nombre, String camposF, String registrosF)  {
+    public CSV(String rutaE,String nombre, String camposF, String registrosF,int id_archivo_salida)  {
 
         
         this.archivoEntrada = new Archivo(rutaE,nombre);
@@ -36,7 +36,8 @@ public class CSV {
 
         String rutaDirectorioSalida = new File("").getAbsolutePath() + "\\src";
         Path pathDirectorioSalida  = Paths.get(rutaDirectorioSalida + rutaE + "\\temp");
-        String nombreSalida = this.nombrarArchivoSalida(nombre);
+        this.rutaDS = pathDirectorioSalida.toString();
+        String nombreSalida = this.nombrarArchivoSalida(nombre,id_archivo_salida);
         this.crearDirectorioSalida(pathDirectorioSalida);
         rutacsv = pathDirectorioSalida + "\\" + nombreSalida;
         File salida = new File(rutacsv);
@@ -44,10 +45,12 @@ public class CSV {
         this.archivoSalida = new Archivo(rutaE+ "\\temp\\",nombreSalida);
 
         this.extraerCabecera();
+        this.cabeceraF = this.cabecera;
         this.fh = this.extraerFiltroH(camposF);
         if (this.fh.equals(Boolean.TRUE)) {
             this.fh = this.validarFiltroH(camposF);
             this.filtroHorizontal = camposF;
+            this.cabeceraF = this.filtrarCampos(this.cabecera);
         }
         fv = this.extraerFiltroV(registrosF);
         if (fv.equals(Boolean.TRUE)) {
@@ -55,10 +58,14 @@ public class CSV {
             this.filtroVertical = registrosF;
         }
 
+
     }
 
     public Boolean getFh(){
         return this.fh;
+    }
+    public String getRutaDS(){
+        return this.rutaDS;
     }
 
     public void inicializarLector(String rutacsv){
@@ -102,7 +109,7 @@ public class CSV {
 
         try {
             cabecera = extractor_linea.readLine();
-            System.out.println("La cabecera del archivo sin filtrar es: " + cabecera);
+            //System.out.println("La cabecera del archivo sin filtrar es: " + cabecera);
 
         } catch (IOException e) {
             System.out.println("El archivo de entrada no pudo ser leido.");
@@ -134,7 +141,20 @@ public class CSV {
 
     }
 
-    public void leerLinea(int n) {
+    public void escribirNLineas(int i,int n) {
+
+        String linea;
+
+        try {
+            List<String> lineas = Files.readAllLines(Paths.get(this.getarchivoEntrada().getRutaE()));
+            for(int j=i;j<n;j++){
+                linea = lineas.get(j);
+                this.escribirLinea(linea);
+            }
+        }
+        catch(IOException e){
+            System.out.println(e);
+        }
 
     }
 
@@ -142,7 +162,8 @@ public class CSV {
 
         try {
             //inicializarEscritor(salida);
-            inyector_linea.write(linea+'\n');
+            if(!linea.equals(""))
+                inyector_linea.write(linea+'\n');
         }
         catch (IOException e) {
             System.out.println("El archivo de salida no pudo ser abierto.");
@@ -170,11 +191,11 @@ public class CSV {
 
         if (campos.equals("*")) {
             filtradoH = Boolean.FALSE;
-            System.out.println("No se ha seleccionado ningun campo para filtrar, se mostraran todos.");
+            //System.out.println("No se ha seleccionado ningun campo para filtrar, se mostraran todos.");
         }
         else {
             filtradoH = Boolean.TRUE;
-            System.out.println("Campos establecidos para filtrar: " + campos);
+            //System.out.println("Campos establecidos para filtrar: " + campos);
         }
 
         return filtradoH;
@@ -186,11 +207,11 @@ public class CSV {
 
         if (registros.equals("*")) {
             filtradoV = Boolean.FALSE;
-            System.out.println("No se ha seleccionado ningun registro para filtrar, se mostraran todos.");
+            //System.out.println("No se ha seleccionado ningun registro para filtrar, se mostraran todos.");
         }
         else {
             filtradoV = Boolean.TRUE;
-            System.out.println("Criterio para filtrar registros: " + registros);
+            //System.out.println("Criterio para filtrar registros: " + registros);
         }
 
         return filtradoV;
@@ -299,7 +320,19 @@ public class CSV {
         }
     }
 
-    public String nombrarArchivoSalida(String nombre){
+    public Archivo getarchivoEntrada(){
+        return this.archivoEntrada;
+    }
+
+    public Archivo getarchivoSalida(){
+        return this.archivoSalida;
+    }
+
+    public String getcabeceraF(){
+        return this.cabeceraF;
+    }
+
+    public String nombrarArchivoSalida(String nombre, int id){
 
         Calendar c = Calendar.getInstance();
         DateFormat dateFormat = new SimpleDateFormat("HH");
@@ -314,9 +347,10 @@ public class CSV {
         String mes = Integer.toString(c.get(Calendar.MONTH) + 1);
         String anio = Integer.toString(c.get(Calendar.YEAR));
         //System.out.println("Archivo de salida: "+ this.nombreE.substring(0,this.nombreE.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")" + this.nombreE.substring(this.nombreE.length()-4));
-
-        return nombre.substring(0,nombre.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")"+ nombre.substring(nombre.length()-4 );
-
+        if(id >=0)
+            return nombre.substring(0,nombre.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")"+ id +nombre.substring(nombre.length()-4 );
+        else
+            return nombre.substring(0,nombre.length()-4) + "_filtered(" + anio+ mes+ dia + '_' + hora + dateFormat.format(minuto) + ")" +nombre.substring(nombre.length()-4 );
     }
 
 }

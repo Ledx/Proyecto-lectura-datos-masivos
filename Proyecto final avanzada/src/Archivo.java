@@ -5,19 +5,19 @@ import static java.lang.System.exit;
 
 public class Archivo {
 
-    public Archivo(String rutaE,String nombre){
+    public Archivo(String ruta,String nombre){
         String r = new File("").getAbsolutePath() + "\\src";
-        this.rutaE = r + rutaE + nombre;
-        System.out.println("Archivo a procesar: " + this.rutaE);
-        this.nombreE = nombre;
-        this.archivo = new File(this.rutaE);
+        this.ruta = r + ruta + nombre;
+        //System.out.println("Archivo a procesar: " + this.ruta);
+        this.nombre = nombre;
+        this.archivo = new File(this.ruta);
         this.calcularLineas();
     }
 
-    private String rutaE;
+    private String ruta;
 
     private int nLineas;
-    private String nombreE;
+    private String nombre;
     private File archivo;
 
     public void calcularLineas(){
@@ -52,11 +52,18 @@ public class Archivo {
     }
 
    public String getRutaE() {
-        return rutaE;
+        return ruta;
     }
 
-    public void setRutaE(String rutaE) {
-        this.rutaE = rutaE;
+    public void setRuta(String ruta) {
+        this.ruta = ruta;
+    }
+
+    public String getNombre(){
+        return this.nombre;
+    }
+    public File getArchivo(){
+        return this.archivo;
     }
 
 

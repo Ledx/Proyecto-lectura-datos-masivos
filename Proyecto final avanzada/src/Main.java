@@ -38,11 +38,13 @@ public class Main {
         tInicial = System.currentTimeMillis();
 
         ProcesaCSV manejador = new ProcesaCSV(rutaE,nombre,campos,registros,hilos);
+        manejador.procesarArchivo();
         System.out.println("Filtrado terminado con exito.");
+
 
         tFinal = System.currentTimeMillis() - tInicial;
 
-        System.out.println("El tiempo de procesamiento fue de: " + tFinal + " [ms]");
+        System.out.println("El tiempo de procesamiento fue de: " + tFinal/1000 + " [s]");
 
     }
 }
