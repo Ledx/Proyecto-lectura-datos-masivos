@@ -149,6 +149,10 @@ public class CSV {
             List<String> lineas = Files.readAllLines(Paths.get(this.getarchivoEntrada().getRutaE()));
             for(int j=i;j<n;j++){
                 linea = lineas.get(j);
+                if (fv.equals(Boolean.TRUE))
+                    linea = filtrarRegistros(linea);
+                if (fh.equals(Boolean.TRUE) && !linea.equals(""))
+                    linea = filtrarCampos(linea);
                 this.escribirLinea(linea);
             }
         }

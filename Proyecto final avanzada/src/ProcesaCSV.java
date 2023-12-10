@@ -1,7 +1,5 @@
 import java.io.*;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.concurrent.ExecutorService;
@@ -100,7 +98,7 @@ public class ProcesaCSV {
             pw.flush();
 
         }
-
+        System.out.println("Comenzando limpieza:");
         this.borrarTemporales(dir);
     }
 
@@ -133,6 +131,9 @@ public class ProcesaCSV {
                 borrarTemporales(temp);
             }
         }
-        directorio.delete();
+        if (!directorio.delete()){
+            System.out.println("El archivo "+directorio.getName()+" no pudo ser eliminado");
+        }
+
     }
 }
