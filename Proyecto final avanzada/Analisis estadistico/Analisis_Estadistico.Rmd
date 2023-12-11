@@ -1,0 +1,119 @@
+---
+title: "Analisis estadistico"
+output:
+  pdf_document: default
+  html_document: default
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r,echo=FALSE, warning=FALSE}
+library(ggplot2)
+
+```
+
+
+```{r,include=FALSE, warning=FALSE}
+
+library(faraway)
+library(bestglm)
+library(MASS)
+library(smurf)
+
+
+datos1 = na.omit(read.csv("100 HRA Records.csv"))
+datos1$Attrition <- as.factor(datos1$Attrition)
+datos1$BusinessTravel <- as.factor(datos1$BusinessTravel)
+datos1$Department <- as.factor(datos1$Department)
+datos1$EducationField <- as.factor(datos1$EducationField)
+datos1$Gender <- as.factor(datos1$Gender)
+datos1$JobRole <- as.factor(datos1$JobRole)
+datos1$MaritalStatus <- as.factor(datos1$MaritalStatus)
+datos1$Over18 <- as.factor(datos1$Over18)
+datos1$OverTime <- as.factor(datos1$OverTime)
+
+str(datos1)
+summary(datos1)
+
+```
+
+Antes de comenzar con el análisis, debemos realizar un preprocesamiento
+de los datos,es decir, eliminaremos algunas variables que no
+participarán en el análisis y también, eliminaremos algunos valores
+nulos y extraños de algunas columnas.
+
+```{r, include=FALSE, warning=FALSE}
+
+# Preprocesamiento
+
+Datos1 <- with(datos1, {
+  data.frame(Age,Attrition,BusinessTravel,DailyRate,Department,DistanceFromHome,Education,EducationField,EmployeeCount,EmployeeNumber,EnvironmentSatisfaction,Gender,HourlyRate,JobInvolvement,JobLevel,JobRole,JobSatisfaction,MaritalStatus,MonthlyIncome,MonthlyRate,NumCompaniesWorked,Over18,OverTime,PercentSalaryHike,PerformanceRating,RelationshipSatisfaction,StandardHours,StockOptionLevel,TotalWorkingYears,TrainingTimesLastYear,WorkLifeBalance,YearsAtCompany,YearsInCurrentRole,YearsSinceLastPromotion,YearsWithCurrManager)
+})
+
+
+```
+
+Una vez realizado esa pequeña adecuación, ya podemos comenzar a realizar
+los distintos análisis.
+
+### Selección de variables considerando sólo los efectos principales de las variables
+
+Considerando un modelo para datos continuos con liga logit y
+distribución binomial, pocedemos a realizar la selección de variables
+utilizando los siguientes métodos y registrando el BIC del modelo
+resultante.
+
+
+#### Usando un método stepwise
+
+```{r, include=FALSE, warning=FALSE}
+
+#Modelo
+
+Datos1.glm <- glm(Attrition ~ Age+BusinessTravel+DailyRate+Department+DistanceFromHome+Education+EducationField+EmployeeNumber+EnvironmentSatisfaction+Gender+HourlyRate+JobInvolvement+JobLevel+JobRole+JobSatisfaction+MaritalStatus+MonthlyIncome+MonthlyRate+NumCompaniesWorked+OverTime+PercentSalaryHike+PerformanceRating+RelationshipSatisfaction+StandardHours+StockOptionLevel+TotalWorkingYears+TrainingTimesLastYear+WorkLifeBalance+YearsAtCompany+YearsInCurrentRole+YearsSinceLastPromotion+YearsWithCurrManager
+, family = binomial(link = "logit"), data = Datos1)
+summary(Datos1.glm)
+
+#Pasos
+
+Datos1.step <- stepAIC(Datos1.glm, trace = FALSE,k=log(dim(Datos1)[1])) 
+
+summary(Datos1.step)
+AIC(Datos1.step)
+
+# La salida es un objeto similar al glm
+Datos1.step$formula
+
+# se pueden verificar los supuestos directamente
+library(DHARMa)
+set.seed(123)
+Datos1.stepres <- simulateResiduals(fittedModel = Datos1.step)
+
+
+```
+
+<br> El BIC obtenido fue de:
+
+```{r, echo=FALSE, warning=FALSE}
+
+BIC(Datos1.step)
+
+```
+
+
+### Conclusiones
+
+Debido a las capacidades del equipo de cómputo utilizado,no fue posible hacer comparativas con otros modelos para contrastar si el BIC bajaba aún mas, pero parece adecuado a simple vista, por lo que,derivado de el uso del modelo lineal, podemos asegurar que utilizando solo las componentes principales, podemos estimar bien la variable Attrition, dicho de otra forma, para poder estimar si una persona va a cambiar de puesto de trabajo o no, las variables que aportan la informacion necesaria se ven de la siguiente manera:
+
+Attrition ~ Age + DailyRate + Department + DistanceFromHome + 
+    EmployeeNumber + EnvironmentSatisfaction + Gender + HourlyRate + 
+    JobInvolvement + JobRole + JobSatisfaction + MaritalStatus + 
+    MonthlyIncome + MonthlyRate + NumCompaniesWorked + PercentSalaryHike + 
+    PerformanceRating + RelationshipSatisfaction + StockOptionLevel + 
+    TotalWorkingYears + TrainingTimesLastYear + YearsAtCompany + 
+    YearsInCurrentRole + YearsSinceLastPromotion + YearsWithCurrManager
